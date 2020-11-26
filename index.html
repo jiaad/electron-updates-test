@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Markdown</title>
+
+  <link rel="stylesheet" href="./node_modules/simplemde/dist/simplemde.min.css">
+  <script src="./node_modules/simplemde/dist/simplemde.min.js"></script>
+</head>
+<style>
+  html, body {
+    height: 100%;
+    display: 100%,;
+    flex: 1;
+    flex-direction: 1;
+  }
+
+  .CodeMirror {
+    flex: 1;
+    min-height: 200px;
+
+  }
+</style>
+<body ondrop="dropHandler(event)">
+  <h1>Editor</h1>
+  <h5 id="filename">fileName</h5>
+  <textarea name="mde" id="mde"></textarea>
+  <button id="exec">click here</button>
+
+  <script>
+
+    const { ipcRenderer, BrowserWindow } = require('electron');
+
+
+    let editor = new SimpleMDE({
+      element: document.getElementById('mde')
+    })
+
+    ipcRenderer.on('editor-event', (event, arg) => {
+      console.log(arg)
+      if(arg === 'toggle-bold')
+        editor.toggleBold()
+      else if(arg === 'save')
+        event.sender.send('save', {value: editor.value(), author: 'jiad'})
+    
+      // event.sender.send('editor-reply', {name: `jiad`, age: 78, pays: 'bangladesh', ville: 'sylhet'})
+    })
+    ipcRenderer.on('load', (event, content) => {
+      if(content){
+        console.log('loaded file')
+        let fileName = document.getElementById('filename').innerHTML = content.name
+        document.title = content.name
+        editor.value(content.content)
+      }
+    })
+    ipcRenderer.send('editor-reply', 'page Loaded')
+
+    function dropHandler(event){
+      event.preventDefault()
+      let {items} = event.dataTransfer
+      console.log(event)
+      if(items && items[0].kind === 'file'){
+        const file = items[0].getAsFile()
+        console.log(file)
+        if(file.type === 'text/markdown'){
+          const reader = new FileReader()
+          reader.onload = e => {
+            editor.codemirror.setValue(e.target.result)
+            document.title = file.path
+            // console.log(e)
+          } //console.log(e.target.result)
+          reader.readAsText(file)
+        }
+      }
+    }
+  </script>
+</body>
+</html>

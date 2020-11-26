@@ -1,0 +1,23 @@
+{
+  "name": "markdown",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "DEBUG=true electron .",
+    "build:macos": "electron-builder --macos --dir"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^11.0.2",
+    "electron-builder": "^22.9.1"
+  },
+  "dependencies": {
+    "esbuild": "^0.8.15",
+    "express": "^4.17.1",
+    "simplemde": "^1.11.2"
+  }
+}
